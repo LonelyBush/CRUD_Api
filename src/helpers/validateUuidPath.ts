@@ -1,5 +1,3 @@
-import { validate } from 'uuid';
-
 export const validatePath = (route: string, url?: string): boolean => {
   if (url) {
     if (url.split('/').length !== route.split('/').length) {
@@ -11,11 +9,6 @@ export const validatePath = (route: string, url?: string): boolean => {
     const match = routeSegments.every((segment, i) => {
       return segment === urlSegments[i] || segment.startsWith(':');
     });
-
-    if (match && routeSegments.includes(':uuid')) {
-      const findValidateUuid = urlSegments.some((segment) => validate(segment));
-      return findValidateUuid;
-    }
 
     return match;
   }

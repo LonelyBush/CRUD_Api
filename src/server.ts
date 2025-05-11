@@ -2,6 +2,7 @@ import http from 'http';
 import 'dotenv/config';
 import {
   createNewUser,
+  deleteUserById,
   getAll,
   getById,
   updateUser,
@@ -28,6 +29,12 @@ const server = http.createServer(function (request, response) {
   ) {
     const uuid = getUuid(url);
     updateUser(request, response, uuid);
+  } else if (
+    validatePath('/api/users/:uuid', url) &&
+    request.method === 'DELETE'
+  ) {
+    const uuid = getUuid(url);
+    deleteUserById(response, uuid);
   } else {
     response.writeHead(404, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({ error: 'Bad url! Check your request url!' }));
