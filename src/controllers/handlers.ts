@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import users from '../users.json';
-import { create } from './fileOperations';
-import { newUser } from 'types';
+import { create, update } from './fileOperations';
+import { newUser, User } from 'types';
 
 export const getAll = (res: ServerResponse<IncomingMessage>) => {
   try {
@@ -26,7 +26,7 @@ export const getById = (res: ServerResponse<IncomingMessage>, id?: string) => {
       res.end(JSON.stringify(user));
     } else {
       res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Not found' }));
+      res.end(JSON.stringify({ error: 'User not found !' }));
     }
   } catch (err) {
     console.error(err);
@@ -54,6 +54,40 @@ export const createNewUser = async (
       method: 'POST',
     });
     return res.end(JSON.stringify(newUser));
+  } catch (err) {
+    const error = err as Error;
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ error: error.message }));
+  }
+};
+
+export const updateUser = async (
+  req: IncomingMessage,
+  res: ServerResponse<IncomingMessage>,
+  id?: string,
+) => {
+  try {
+    const user: User[] = users.filter((elem) => elem.id === id);
+    const [findById] = users;
+    if (user.length > 0 && findById) {
+      const body = await createPostBody(req);
+      const { username, age, hobbies } = body;
+
+      const updateUserBody = {
+        username: username || findById.username,
+        age: age || findById.age,
+        hobbies: hobbies || findById.hobbies,
+      };
+
+      const updateUser = await update(updateUserBody, id!);
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        method: 'PUT',
+      });
+      return res.end(JSON.stringify(updateUser));
+    } else {
+      throw new Error('User is not found ! Try again.');
+    }
   } catch (err) {
     const error = err as Error;
     res.writeHead(400, { 'Content-Type': 'application/json' });

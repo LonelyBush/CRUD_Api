@@ -1,6 +1,11 @@
 import http from 'http';
 import 'dotenv/config';
-import { createNewUser, getAll, getById } from './controllers/handlers';
+import {
+  createNewUser,
+  getAll,
+  getById,
+  updateUser,
+} from './controllers/handlers';
 import { validatePath } from './helpers/validateUuidPath';
 import { getUuid } from './helpers/getUuid';
 
@@ -17,9 +22,15 @@ const server = http.createServer(function (request, response) {
     getById(response, uuid);
   } else if (validatePath('/api/users', url) && request.method === 'POST') {
     createNewUser(request, response);
+  } else if (
+    validatePath('/api/users/:uuid', url) &&
+    request.method === 'PUT'
+  ) {
+    const uuid = getUuid(url);
+    updateUser(request, response, uuid);
   } else {
     response.writeHead(404, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify({ error: 'Not found' }));
+    response.end(JSON.stringify({ error: 'Bad url! Check your request url!' }));
   }
 });
 
