@@ -122,6 +122,7 @@ export const deleteUserById = async (
         'Content-Type': 'application/json',
         method: 'DELETE',
       });
+      return res.end();
     } else {
       res.writeHead(404, { 'Content-Type': 'application/json' });
       throw new Error('User not found !');
