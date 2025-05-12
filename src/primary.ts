@@ -9,11 +9,11 @@ const SERVER_PORT = parseInt(process.env.SERVER_PORT!);
 const CPU_COUNT = availableParallelism() - 1;
 
 if (cluster.isPrimary) {
-  const workers: Worker[] = [];
+  const workers: { worker: Worker; port: number }[] = [];
 
-  for (let port = SERVER_PORT + 1; port <= SERVER_PORT + CPU_COUNT; port++) {
+  for (let port = SERVER_PORT; port <= SERVER_PORT + CPU_COUNT; port++) {
     const worker = cluster.fork({ WORKER_PORT: port });
-    workers.push(worker);
+    workers.push({ worker, port });
   }
   let currentIndex = 0;
 
@@ -21,7 +21,13 @@ if (cluster.isPrimary) {
   http
     .createServer((req, res) => {
       const findWorker = workers[currentIndex];
-      console.log(findWorker);
+      console.log(
+        'Сurrent worker ' +
+          findWorker?.worker.process.pid +
+          ' ' +
+          'Current port: ' +
+          findWorker?.port,
+      );
       currentIndex = (currentIndex + 1) % workers.length;
       const proxyOptions = {
         hostname: 'localhost',
@@ -57,8 +63,6 @@ if (cluster.isPrimary) {
     cluster.fork({ WORKER_PORT: process.env.WORKER_PORT });
   });
 } else {
-  setupServer().listen(process.env.WORKER_PORT, () => {
-    console.log(`Server listening on port: ${process.env.WORKER_PORT}`);
-  });
+  setupServer().listen(process.env.WORKER_PORT);
   console.log(`Worker process is running on PID: ${process.pid}`);
 }
