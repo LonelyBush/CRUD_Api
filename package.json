@@ -2,12 +2,12 @@
   "name": "crud_api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start:dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start:multi": "nodemon src/primary.ts",
-    "start:prod": "npm run build && node dist/server.js",
+    "start:dev": "nodemon ./src/server.ts",
+    "start:prod": "npm run build && node ./dist/server.js",
+    "start:multi": "npm run build && node ./dist/src/primary.js",
     "test": "jest --silent --forceExit"
   },
   "keywords": [],
